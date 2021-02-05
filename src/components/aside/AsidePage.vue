@@ -48,7 +48,7 @@
       MenuList() {
         getMenuList()
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           this.menuList=res.data.data
         })
       }
@@ -63,5 +63,8 @@
 .collpace {
   text-align: center;
   font-size: 24px;
+}
+.el-aside {
+  width: 210px;
 }
 </style>
