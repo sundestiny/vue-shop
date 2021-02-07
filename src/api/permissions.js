@@ -6,3 +6,10 @@ export const getMenuList= () => {
     url:`menus`
   })
 }
+//获取所有权限列表
+export const getRightsList= () => {
+  return request({
+    method:'GET',
+    url:`rights/list`
+  })
+}
