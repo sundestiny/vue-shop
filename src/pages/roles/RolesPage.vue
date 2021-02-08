@@ -4,7 +4,7 @@
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
-      <el-breadcrumb-item>角色列表</el-breadcrumb-item>
+      <el-breadcrumb-item >角色列表</el-breadcrumb-item>
     </el-breadcrumb>
 <!--    角色列表展示-->
     <el-card>
@@ -87,22 +87,55 @@
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
-            <el-button type="warning" icon="el-icon-settings" size="mini">分配权限</el-button>
+            <el-button type="warning" icon="el-icon-settings" size="mini" @click="showSetRightDialog(scope.row)">分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
+<!--    展示分配权限列表-->
+    <el-dialog
+      title="分配权限"
+      :visible.sync="setRightDialog"
+      width="50%"
+      @close="resetId"
+    >
+<!--      树形列表-->
+      <el-tree
+        :data="rightTree"
+        show-checkbox
+        node-key="id"
+        :default-expand-all="true"
+        lazy
+        :default-checked-keys="nodeID"
+        :props="defaultProps"
+        ref="treeRef"
+      >
+      </el-tree>
+      <span slot="footer" >
+    <el-button @click="setRightDialog = false">取 消</el-button>
+    <el-button type="primary" @click="allRight">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {getRolesList,removeRolesRights} from "../../api/roles";
+  import {getRightsTree,getRights} from "../../api/permissions";
 
   export default {
     name: "RolesPage",
     data () {
       return {
-        roles:[]
+        roles:[],
+        setRightDialog:false,
+        rightTree:[],
+        defaultProps: {
+          children: 'children',
+          label: 'authName'
+        },
+        nodeID:[],
+        roleID:'' //角色ID
       }
     },
     methods:{
@@ -137,6 +170,47 @@
             message: '已取消删除'
           });
         });
+      },
+      //展示分配权限列表
+      showSetRightDialog (role) {
+       this.roleID=role.id
+        this.getId(role,this.nodeID)
+        this.setRightDialog=true
+        getRightsTree()
+        .then((res) => {
+          this.rightTree=res.data.data
+          // console.log(res)
+        })
+      },
+      //获取所有三级权限的id
+      getId (node,arr) {
+        // console.log(node.id)
+        if(!node.children) {
+          return arr.push(node.id)
+        }
+        node.children.forEach((item) => {
+          this.getId(item,arr)
+          // console.log(arr)
+        })
+      },
+      //关闭分配权限弹窗清空上一次默认选中id
+      resetId () {
+        this.nodeID=[]
+      },
+      //分配权限
+      allRight () {
+        const keys=[
+          ...this.$refs.treeRef.getCheckedKeys(),
+          ...this.$refs.treeRef.getHalfCheckedNodes()
+        ]
+        const idStr=keys.join(',')
+
+        getRights(this.roleID,idStr)
+        .then((res) => {
+          console.log(res)
+          this.rolesList()
+          this.setRightDialog=false
+        })
       }
     },
     created() {

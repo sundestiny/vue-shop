@@ -4,7 +4,8 @@ import router from './router'
 import './assets/css/index.css'
 import ElementUI  from 'element-ui'		//引入ElementUI
 import 'element-ui/lib/theme-chalk/index.css'	//全局引入css
-
+import TreeTable from 'vue-table-with-tree-grid'
+Vue.component('tree-table',TreeTable)
 Vue.use(ElementUI);	//注册ElementUI
 Vue.config.productionTip = false
 
