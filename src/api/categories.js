@@ -15,5 +15,25 @@ export const addCategoriesList= (data) => {
     data
   })
 }
-
+//获取参数列表
+export const getParamsList= (id,sel) => {
+  return request({
+    method: 'GET',
+    url: `categories/${id}/attributes`,
+    params:{
+      sel
+    }
+  })
+}
+//添加动态参数或者静态属性
+export const addParams= (id,attr_name,attr_sel) => {
+  return request({
+    method: 'POST',
+    url: `categories/${id}/attributes`,
+    data:{
+      attr_name,
+      attr_sel
+    }
+  })
+}
 
